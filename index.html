@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="icon" href="aliceLogoLimpo.png" type="image/png">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALICE|UIM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: white;
+        }
+        #chatbox {
+            width: 80%;
+            max-width: 600px;
+            height: 30vh;
+            background-color: #FECAEA;
+            border: 1px solid #FECAEA;
+            color:#E40F91;
+            padding: 10px;
+            margin-top: 10%;
+            overflow-y: scroll;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+        }
+        .message {
+            margin: 10px 0;
+        }
+        .user {
+            text-align: right;
+        }
+        .bot {
+            text-align: left;
+        }
+        #inputArea {
+            width: 80%;
+            max-width: 600px;
+            display: flex;
+            margin-top: 10px;
+            border-radius: 15px;
+        }
+        #userInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ffe4f5;
+            border-right: none;
+            border-radius: 15px;
+        }
+        #sendButton {
+            padding: 12px;
+            border: 1px solid #E40F91;
+            background-color:#E40F91;
+            color: white;
+            cursor: pointer;
+            border-radius: 15px;
+        }
+        #sendButton:hover{
+            border: 1px solid #ffb3e2;
+            background-color:#ffb3e2 ;
+        }
+        #falar {
+            
+            padding: 12px;
+            border: 1px solid #FECAEA;
+            background-color:#FECAEA ;
+            color:#000000;
+            cursor: pointer;
+            border-radius: 15px;
+        }
+        #falar:hover{
+            border: 1px solid #ffb3e2;
+            background-color:#ffb3e2 ;
+        }
+
+        .bot{
+            background-color:#E40F91;
+            color: white;
+            border-radius: 5px;
+            width:fit-content;
+            padding: 5px;
+
+        }
+    </style>
+</head>
+<body>
+    <a href="../index.html" target="_blank"><img src="aliceLogoLimpo.png" alt="" srcset="" width="50px" height="50px" style="display: flex;left:2%;top: 2%;position: absolute;"></a>
+
+    <video src="falando.mp4" style="height: 200px;width: 200px;position: absolute;justify-content: center;top: 5%;border-radius: 20px;opacity: 0;" class="falando"></video>
+    <video src="paisana .mp4" style="height: 200px;width: 200px;position: absolute;justify-content: center;top: 5%;border-radius: 20px;opacity: 1;"  type="video/mp4" class="paisana"></video>
+    <video src="erro2.mov" style="height: 200px;width: 200px;position: absolute;justify-content: center;top: 5%;border-radius: 20px;opacity: 0;" class="erro" ></video>
+    <video src="impaciente.mp4" style="height: 200px;width: 200px;position: absolute;justify-content: center;top: 5%;border-radius: 20px;opacity: 0;" class="impaciente" ></video>
+
+
+
+    <div id="chatbox"></div>
+    <div id="inputArea">
+        <input type="text" id="userInput" placeholder="Fale com a Alice" />
+        <button id="sendButton">Enviar</button>
+        <button id="falar">falar</button>
+    </div>
+    <p style=" color:#E40F91;font-size: 10px;display: flex;justify-content: center;position: absolute;top: 90%;">© 2024 POR UIM - UNIDADE DE INTELIGÊNCIA DE MERCADO - SEBRAE MARANHÃO</p> 
+
+
+    <script>
+        const falar = document.getElementById('falar')
+        const recognition = createRecognition()
+        const chatbox = document.getElementById('chatbox');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        let paisana = document.querySelector('.paisana')
+
+        async function sendMessage() {
+            const userMessage = userInput.value;
+            if (userMessage.trim() === "") return;
+
+            displayMessage(userMessage, 'user');
+            userInput.value = '';
+
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer sk-proj-iV2y8llz5oCGWcDCDKTqT3BlbkFJRcl48YaLbPHOk5flz7QA'
+                },
+                body: JSON.stringify({
+                    model: "ft:gpt-3.5-turbo-0125:personal:teste4:9guvdYzP",
+                    messages: [{ role: "user", content: userMessage }]
+                })
+            });
+
+            const data = await response.json();
+            displayMessage(data.choices[0].message.content.trim(), 'bot');
+        }
+
+        function displayMessage(message, sender) {
+            const oldMessages = document.querySelectorAll('.bot, .user');
+            oldMessages.forEach(element => {
+            element.remove();
+          });
+
+
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(sender);
+            messageElement.textContent = message;
+            chatbox.appendChild(messageElement);
+            chatbox.scrollTop = chatbox.scrollHeight;
+            console.log(messageElement)
+            var video = document.querySelector('.falando');
+                video.style.opacity = "1";
+                video.style.zIndex ="4";
+                video.loop = true
+                video.play()
+            var messageBot = document.querySelector('.bot');
+            if (messageBot) {
+                /*console.log(messageBot.textContent);
+                const synth = window.speechSynthesis;
+                voices = synth.getVoices();
+                let t = messageBot.textContent;
+                let ut = new SpeechSynthesisUtterance();
+                ut.voice = voices.find(voice => voice.name.includes('female'));
+                ut.lang = "pt-BR";
+                ut.text = t;
+                synth.speak(ut);*/
+                let synth = window.speechSynthesis;
+     
+         let t = messageBot.textContent;
+
+      let ut = new SpeechSynthesisUtterance();
+      ut.lang = "pt-BR";
+      ut.text = t;
+
+      function selectVoice() {
+        let voices = synth.getVoices();
+        let femaleVoice = voices.find(voice => voice.name === 'Google português do Brasil');
+        if (femaleVoice) {
+          ut.voice = femaleVoice;
+        } else {
+          // Fallback to any Portuguese voice if no specific female voice is found
+          ut.voice = voices.find(voice => voice.lang === 'pt-BR');
+        }
+        synth.speak(ut);
+      }
+
+      if (synth.getVoices().length > 0) {
+        selectVoice();
+      } else {
+        synth.onvoiceschanged = selectVoice;
+      }
+    }
+             }
+            /*for (var i = 0; i < messageBot.length; i++) {
+              //console.log(messageBot[i].textContent);
+             const synth = window.speechSynthesis;
+                voices = synth.getVoices();
+                let t = messageBot[i].textContent;
+                let ut = new SpeechSynthesisUtterance();
+                ut.voice = voices.find(voice => voice.name.includes('female'));
+                ut.lang = "pt-BR";
+                ut.text = t;
+                synth.speak(ut);
+            }*/
+                
+        
+
+        
+                
+
+        sendButton.addEventListener('click', sendMessage);
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        userInput.addEventListener('click',()=>{
+            paisana.play()
+            paisana.style.opacity = "1";
+            paisana.style.zIndex ="1";
+            paisana.loop = true
+         
+        })
+        setInterval(()=>{
+        var video = document.querySelector('.impaciente');
+        video.style.opacity = "1";
+        video.style.zIndex ="1";
+        video.loop = true
+        video.play();
+    
+    
+   
+        }, 10000)
+
+       /* setInterval(()=>{
+        var video = document.querySelector('.falando');
+        video.style.opacity = "0";
+        video.loop =false;
+        }, 20000)*/
+
+        let listening = false
+
+        falar.addEventListener('click', e =>{
+         if(!recognition) return;
+         listening ? recognition.stop() : recognition.start()
+         falar.innerHTML = listening ?  falar.style.backgroundColor = 'falar'  : falar.style.backgroundColor = 'escutando'
+    
+        })
+
+
+        function createRecognition(){
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = SpeechRecognition !== undefined ? new SpeechRecognition() : null
+
+        if(!recognition){
+        userInput.innerHTML = "não encontrou a função de fala"
+        return null
+        }
+   
+        recognition.lang ="pt_BR"
+        recognition.onstart = () => listening = true
+        recognition.onend = () => listening = false
+        recognition.onerror = e => console.log('error',e)
+        recognition.onresult = e => userInput.value = e.results[0][0].transcript
+    
+    
+   
+
+    
+
+        return recognition
+    }
+
+
+
+    </script>
+
+
+</body>
+</html>
